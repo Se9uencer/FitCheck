@@ -72,7 +72,7 @@ const questions: Question[] = [
   },
   {
     id: "fabricDrape",
-    question: "How important is fabric drape? (Fabric drape describes how a fabric hangs and flows on the body.)",
+    question: "How important is fabric drape? (Fabric drape describes how a fabric hangs and flows on the body)",
     options: ["not important", "somewhat important", "very important"],
   },
   {
