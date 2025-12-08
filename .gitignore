@@ -1,0 +1,15 @@
+# Node and Next.js
+.next/
+node_modules/
+
+# Env files (never commit)
+.env
+.env.*
+!.env.example
+.env.local
+
+# Misc
+.DS_Store
+*.log
+
+
