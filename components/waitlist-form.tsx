@@ -53,7 +53,7 @@ export function WaitlistForm() {
                 <p className="text-sm text-primary font-medium">✓ Thank you! We'll be in touch soon.</p>
               )}
               {status === "error" && (
-                <p className="text-sm text-destructive font-medium">Something went wrong. Please try again.</p>
+                <p className="text-sm text-destructive font-medium">This email has already joined the waitlist.</p>
               )}
             </form>
           </div>
