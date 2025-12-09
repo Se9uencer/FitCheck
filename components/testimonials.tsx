@@ -6,39 +6,19 @@ import { Quote, Star, ChevronLeft, ChevronRight } from "lucide-react"
 
 const testimonials = [
   {
-    quote: "I've returned 3 out of every 5 online orders for the past decade. The sizing inconsistency across brands is maddening. This is exactly what I've been waiting for.",
-    name: "Sarah K.",
-    role: "Fashion enthusiast",
+    quote: "Online shopping has become a skill I’m tired of practicing. Every brand fits differently. If I could trust the fit before I buy, I’d finally relax.",
+    name: "Harini Akkugari",
+    role: "Waitlist member",
     rating: 5,
-    avatar: "SK",
+    avatar: "HA",
   },
   {
-    quote: "As someone with an athletic build, I've never found clothes that fit right off the rack. Being able to preview fit before buying would be game-changing.",
-    name: "Marcus T.",
-    role: "Fitness instructor",
+    quote: "I can’t believe no one has built this yet. Returns are exhausting—I just want clothes that fit without the guessing game.",
+    name: "Ritul Dwivedi",
+    role: "Waitlist member",
     rating: 5,
-    avatar: "MT",
+    avatar: "RD",
   },
-  {
-    quote: "I work in fashion retail and see the return problem daily. Brands need this technology. Customers need this technology. It's inevitable.",
-    name: "Priya R.",
-    role: "Retail manager",
-    rating: 5,
-    avatar: "PR",
-  },
-  {
-    quote: "Online shopping anxiety is real. The stress of not knowing if something will fit has kept me from trying new brands. This could change everything.",
-    name: "Jennifer L.",
-    role: "Working professional",
-    rating: 5,
-    avatar: "JL",
-  },
-]
-
-const stats = [
-  { value: "2,400+", label: "Waitlist signups" },
-  { value: "89%", label: "Say fit is #1 concern" },
-  { value: "4.9", label: "Average interest rating" },
 ]
 
 export function Testimonials() {
@@ -77,25 +57,6 @@ export function Testimonials() {
             <p className="mt-6 text-lg text-muted-foreground">
               Thousands have shared their fit struggles. Here&apos;s why they&apos;re excited about what we&apos;re building.
             </p>
-          </motion.div>
-
-          {/* Stats row */}
-          <motion.div
-            className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {stats.map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-3xl md:text-4xl font-serif text-gradient font-light">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
           </motion.div>
 
           {/* Testimonial carousel */}

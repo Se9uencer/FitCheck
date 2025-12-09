@@ -137,9 +137,9 @@ export function FeaturesGrid() {
 
                     <div className="flex-1">
                       {/* Highlight badge */}
-                      <div className="mb-3">
+                      <div className="mt-3 mb-3">
                         <span 
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                          className="inline-flex items-center gap-2 px-2.75 py-1 rounded-full text-xs font-medium"
                           style={{ 
                             backgroundColor: `${feature.color.replace(")", " / 0.15)")}`,
                             color: feature.color
