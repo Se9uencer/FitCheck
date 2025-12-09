@@ -5,7 +5,8 @@ import { createPortal } from "react-dom"
 import { supabase } from "@/lib/supabaseClient"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { motion, AnimatePresence } from "framer-motion"
+import { X, Mail, Check, Sparkles } from "lucide-react"
 
 type EmailWaitlistModalProps = {
   open: boolean
@@ -21,6 +22,21 @@ export function EmailWaitlistModal({ open, onOpenChange }: EmailWaitlistModalPro
     setMounted(true)
   }, [])
 
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false)
+    }
+    if (open) {
+      document.addEventListener("keydown", handleEscape)
+      document.body.style.overflow = "hidden"
+    }
+    return () => {
+      document.removeEventListener("keydown", handleEscape)
+      document.body.style.overflow = "unset"
+    }
+  }, [open, onOpenChange])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
@@ -34,60 +50,144 @@ export function EmailWaitlistModal({ open, onOpenChange }: EmailWaitlistModalPro
     setEmail("")
   }
 
-  if (!open || !mounted) return null
+  if (!mounted) return null
 
   const modal = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
-      <Card className="relative z-[101] w-[92%] max-w-md border-border/50 shadow-xl">
-        <CardContent className="p-6 space-y-5">
-          {status !== "success" ? (
-            <>
-              <div className="space-y-1 text-center">
-                <h3 className="text-xl font-semibold">Join waitlist</h3>
-                <p className="text-sm text-muted-foreground">
-                  Get early access to try-ons tailored to your body. Be the first to test new drops.
-                </p>
-              </div>
-              <form onSubmit={handleSubmit} className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1"
-                />
-                <Button type="submit" disabled={status === "loading"}>
-                  {status === "loading" ? "Joining..." : "Join"}
-                </Button>
-              </form>
-              {status === "error" && (
-                <p className="text-sm text-destructive">Something went wrong. Please try again.</p>
-              )}
-              <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => onOpenChange(false)}
-                  className="text-sm text-muted-foreground hover:text-foreground"
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => onOpenChange(false)}
+          />
+          
+          {/* Modal */}
+          <motion.div
+            className="relative z-[101] w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: "spring", duration: 0.5 }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => onOpenChange(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-secondary transition-colors z-10"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Content */}
+            <div className="p-8">
+              {status !== "success" ? (
+                <>
+                  {/* Icon */}
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                    <Mail className="w-7 h-7 text-primary" />
+                  </div>
+
+                  {/* Heading */}
+                  <h3 className="text-2xl font-serif font-light mb-2">
+                    Get early access
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    Be among the first to experience fit technology that actually works. 
+                    We&apos;ll notify you as soon as we launch.
+                  </p>
+
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="h-12 pl-4 pr-4 rounded-xl bg-secondary border-border focus:border-primary"
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      disabled={status === "loading"}
+                      className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                    >
+                      {status === "loading" ? (
+                        <motion.div
+                          className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                      ) : (
+                        "Join waitlist"
+                      )}
+                    </Button>
+                  </form>
+
+                  {status === "error" && (
+                    <motion.p
+                      className="text-sm text-destructive mt-4 text-center"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      Something went wrong. Please try again.
+                    </motion.p>
+                  )}
+
+                  {/* Trust elements */}
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        Free for all users
+                      </span>
+                      <span>•</span>
+                      <span>No spam, ever</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <motion.div
+                  className="text-center py-6"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                 >
-                  Cancel
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center space-y-3 py-4">
-              <h3 className="text-xl font-semibold">Thanks for joining!</h3>
-              <p className="text-sm text-muted-foreground">We’ll email you as soon as we have early access.</p>
-              <Button onClick={() => onOpenChange(false)}>Close</Button>
+                  {/* Success icon */}
+                  <motion.div
+                    className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 0.1 }}
+                  >
+                    <Check className="w-8 h-8 text-green-500" />
+                  </motion.div>
+
+                  <h3 className="text-2xl font-serif font-light mb-2">
+                    You&apos;re on the list!
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    We&apos;ll email you as soon as early access opens. 
+                    Get ready to never guess your size again.
+                  </p>
+                  
+                  <Button 
+                    onClick={() => onOpenChange(false)}
+                    className="rounded-xl"
+                  >
+                    Close
+                  </Button>
+                </motion.div>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 
   return createPortal(modal, document.body)
 }
-
-

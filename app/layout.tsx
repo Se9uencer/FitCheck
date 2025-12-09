@@ -1,15 +1,26 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Instrument_Sans, Cormorant_Garamond } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const instrumentSans = Instrument_Sans({ 
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
+
+const cormorantGaramond = Cormorant_Garamond({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-serif",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "FitCheck - Precision in fashion",
+  title: "FitCheck - See How Clothes Fit Before You Buy",
   description:
-    "See how clothes look on your body before you buy. Upload your measurements once and get a realistic mannequin designed to match your shape.",
+    "Revolutionary fit technology. Upload your measurements once and visualize how any garment will look on your unique body. No more returns, no more guessing.",
   generator: "v0.app",
   icons: {
     icon: [
@@ -36,8 +47,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en" className={`${instrumentSans.variable} ${cormorantGaramond.variable}`}>
+      <body className="font-sans antialiased">
         {children}
         <Analytics />
       </body>
