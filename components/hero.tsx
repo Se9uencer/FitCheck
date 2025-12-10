@@ -128,10 +128,21 @@ export function Hero() {
             <Button
               size="lg"
               className="group h-14 px-8 text-base font-medium rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              asChild
+            >
+              <Link href="/measurements" className="flex items-center gap-2">
+                <Scan className="w-4 h-4" />
+                Get your fit profile
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-14 px-8 text-base font-medium rounded-full border-border hover:bg-secondary"
               onClick={() => setWaitlistOpen(true)}
             >
               Get early access
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
               size="lg" 
