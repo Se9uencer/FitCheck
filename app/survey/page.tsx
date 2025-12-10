@@ -40,11 +40,13 @@ const questions: Question[] = [
   {
     id: "bodyShape",
     question: "What category best describes your body shape?",
+    type: "checkbox",
     options: ["slim", "athletic", "curvy", "plus", "tall", "petite"],
   },
   {
     id: "size",
     question: "What size do you usually order?",
+    type: "checkbox",
     options: ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL", "other"],
   },
   {
@@ -73,6 +75,7 @@ const questions: Question[] = [
   {
     id: "shopFor",
     question: "What do you shop for most often?",
+    type: "checkbox",
     options: ["Tops", "Jeans / Pants", "Dresses / Skirts", "Activewear", "Everything"],
   },
   {
@@ -141,20 +144,59 @@ export default function SurveyPage() {
     }
     if (fitIssues.length === 0) fitIssues = null as unknown as string[]
 
-    await supabase.from("survey_results").insert({
+    let shopFor =
+      Array.isArray(answers["shopFor"])
+        ? (answers["shopFor"] as string[])
+        : answers["shopFor"]
+        ? [answers["shopFor"] as string]
+        : []
+    if (shopFor.includes("Everything")) {
+      shopFor = ["Tops", "Jeans / Pants", "Dresses / Skirts", "Activewear", "Everything"]
+    }
+    if (shopFor.length === 0) shopFor = null as unknown as string[]
+
+    let arMethod = answers["arMethod"] || null
+    if (arMethod === "other") {
+      const otherText = (answers["arMethodOther"] as string | undefined)?.trim()
+      arMethod = otherText || null
+    }
+
+    let bodyShape =
+      Array.isArray(answers["bodyShape"])
+        ? (answers["bodyShape"] as string[])
+        : answers["bodyShape"]
+        ? [answers["bodyShape"] as string]
+        : []
+    if (bodyShape.length === 0) bodyShape = null as unknown as string[]
+
+    let size =
+      Array.isArray(answers["size"])
+        ? (answers["size"] as string[])
+        : answers["size"]
+        ? [answers["size"] as string]
+        : []
+    if (size.length === 0) size = null as unknown as string[]
+
+    const { error } = await supabase.from("survey_results").insert({
       identity: answers["identity"] || null,
-      body_shape: answers["bodyShape"] || null,
-      size: answers["size"] || null,
+      body_shape: bodyShape,
+      size: size,
       fit_issues: fitIssues,
-      shop_for: answers["shopFor"] || null,
+      shop_for: shopFor,
       fabric_drape: answers["fabricDrape"] || null,
       ar_used: arUsed,
       ar_experience_rating: arExperienceRating,
-      ar_method: answers["arMethod"] || null,
+      ar_method: arMethod,
       mannequin_used: answers["mannequinUsed"] ? answers["mannequinUsed"] === "yes" : null,
       mannequin_helpful: answers["mannequinHelpful"] ? answers["mannequinHelpful"] === "yes" : null,
       extra_notes: answers["extraNotes"] || null,
     })
+
+    if (error) {
+      console.error("Error submitting survey:", error)
+      alert("Failed to submit survey. Please try again.")
+      return
+    }
 
     setSubmitted(true)
   }
@@ -167,6 +209,26 @@ export default function SurveyPage() {
       const current = prev[questionId]
       const currentArr = Array.isArray(current) ? current : []
       const exists = currentArr.includes(value)
+      
+      // Special handling for "Everything" option in shopFor
+      if (questionId === "shopFor") {
+        if (value === "Everything") {
+          if (exists) {
+            // Deselect Everything - clear all
+            return { ...prev, [questionId]: [] }
+          } else {
+            // Select Everything - select all options
+            return { ...prev, [questionId]: ["Tops", "Jeans / Pants", "Dresses / Skirts", "Activewear", "Everything"] }
+          }
+        } else {
+          // If selecting a specific option, remove "Everything" if it's selected
+          let next = exists ? currentArr.filter((v) => v !== value) : [...currentArr, value]
+          next = next.filter((v) => v !== "Everything")
+          return { ...prev, [questionId]: next }
+        }
+      }
+      
+      // Default behavior for other multi-select questions
       const next = exists ? currentArr.filter((v) => v !== value) : [...currentArr, value]
       return { ...prev, [questionId]: next }
     })
@@ -188,6 +250,9 @@ export default function SurveyPage() {
       const otherIsSelected = arr.includes("other (please specify)")
       const otherOk = !otherIsSelected || ((answers["fitIssuesOther"] as string | undefined)?.trim()?.length ?? 0) > 0
       return hasAny && otherOk
+    }
+    if (q.id === "arMethod" && val === "other") {
+      return ((answers["arMethodOther"] as string | undefined)?.trim()?.length ?? 0) > 0
     }
     return typeof val === "string" && val.length > 0
   }
@@ -291,6 +356,11 @@ export default function SurveyPage() {
                       Fabric drape describes how a fabric hangs and flows on the body
                     </p>
                   )}
+                  {currentQuestion?.id === "arUsed" && (
+                    <p className="text-muted-foreground text-sm mt-2">
+                      Augmented reality (AR) overlays digital images onto your real-world view, typically through your phone's camera
+                    </p>
+                  )}
                 </div>
 
                 {/* Answer options */}
@@ -371,6 +441,16 @@ export default function SurveyPage() {
                             />
                             <span className="capitalize">{option}</span>
                           </Label>
+                          {currentQuestion.id === "arMethod" && option === "other" && answers[currentQuestion.id] === "other" && (
+                            <input
+                              type="text"
+                              className="mt-3 ml-8 w-[calc(100%-2rem)] p-3 rounded-lg bg-secondary border border-border"
+                              placeholder="Please describe what the app did"
+                              value={(answers["arMethodOther"] as string) || ""}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => handleAnswerChange("arMethodOther", e.target.value)}
+                            />
+                          )}
                         </motion.div>
                       ))}
                     </RadioGroup>

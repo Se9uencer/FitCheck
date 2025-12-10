@@ -22,6 +22,14 @@ export function EmailWaitlistModal({ open, onOpenChange }: EmailWaitlistModalPro
     setMounted(true)
   }, [])
 
+  // Reset state when modal opens
+  useEffect(() => {
+    if (open) {
+      setStatus("idle")
+      setEmail("")
+    }
+  }, [open])
+
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
